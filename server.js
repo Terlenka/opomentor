@@ -35,6 +35,23 @@ db.connect(err => {
         console.error('¿Estás usando el host correcto?', dbConfig.host);
     } else {
         console.log('✅ CONEXIÓN EXITOSA: El servidor está unido a la base de datos opoo_mysql');
+        
+        // --- CREACIÓN AUTOMÁTICA DE TABLAS ---
+        const createTableQuery = `
+            CREATE TABLE IF NOT EXISTS users (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                nombre VARCHAR(100),
+                email VARCHAR(100) UNIQUE NOT NULL,
+                password VARCHAR(255) NOT NULL,
+                plan_suscripcion ENUM('gratis', 'basico', 'premium') DEFAULT 'gratis',
+                fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        `;
+        
+        db.query(createTableQuery, (err) => {
+            if (err) console.error("❌ Error creando la tabla users:", err);
+            else console.log("✅ Tabla 'users' lista para usar");
+        });
     }
 });
 
