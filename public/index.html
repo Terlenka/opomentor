@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OpoMentor - Login & Dashboard</title>
+    <title>OpoMentor - Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -12,60 +12,121 @@
     <div id="auth-section" class="min-h-screen flex items-center justify-center p-4">
         <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
             <h1 class="text-3xl font-bold text-indigo-700 mb-6 text-center">OpoMentor</h1>
-            
             <div id="login-form">
                 <input type="email" id="login-email" placeholder="Email" class="w-full mb-4 p-3 border rounded-xl">
                 <input type="password" id="login-pass" placeholder="Contraseña" class="w-full mb-6 p-3 border rounded-xl">
-                <button onclick="handleLogin()" class="w-full bg-indigo-600 text-white p-3 rounded-xl font-bold hover:bg-indigo-700 transition">Entrar a estudiar</button>
-                <p class="mt-4 text-center text-sm">¿No tienes cuenta? <a href="#" onclick="toggleAuth()" class="text-indigo-600 font-bold">Regístrate</a></p>
+                <button onclick="handleLogin()" class="w-full bg-indigo-600 text-white p-3 rounded-xl font-bold hover:bg-indigo-700">Entrar</button>
+                <p class="mt-4 text-center">¿Nuevo? <a href="#" onclick="toggleAuth()" class="text-indigo-600 font-bold">Regístrate</a></p>
             </div>
-
             <div id="register-form" class="hidden">
                 <input type="text" id="reg-nombre" placeholder="Nombre completo" class="w-full mb-4 p-3 border rounded-xl">
                 <input type="email" id="reg-email" placeholder="Email" class="w-full mb-4 p-3 border rounded-xl">
                 <input type="password" id="reg-pass" placeholder="Contraseña" class="w-full mb-6 p-3 border rounded-xl">
-                <button onclick="handleRegister()" class="w-full bg-green-600 text-white p-3 rounded-xl font-bold hover:bg-green-700 transition">Crear cuenta</button>
-                <p class="mt-4 text-center text-sm">¿Ya tienes cuenta? <a href="#" onclick="toggleAuth()" class="text-indigo-600 font-bold">Inicia sesión</a></p>
+                <button onclick="handleRegister()" class="w-full bg-green-600 text-white p-3 rounded-xl font-bold hover:bg-green-700">Crear Cuenta Gratis</button>
             </div>
         </div>
     </div>
 
     <div id="dashboard-section" class="hidden min-h-screen flex flex-col">
         <nav class="bg-indigo-700 text-white p-4 shadow-md flex justify-between items-center">
-            <span class="font-bold text-xl tracking-tight">OpoMentor</span>
+            <span class="font-bold text-xl">OpoMentor</span>
             <div class="flex items-center space-x-4">
-                <span id="user-display-name" class="text-sm font-medium"></span>
+                <span id="user-display-name" class="font-medium"></span>
                 <button onclick="logout()" class="text-xs bg-indigo-800 px-3 py-1 rounded">Cerrar sesión</button>
             </div>
         </nav>
-        
+
         <main class="flex-1 container mx-auto p-4 grid grid-cols-1 lg:grid-cols-4 gap-6 mt-4">
-            <div class="lg:col-span-3 bg-white rounded-2xl shadow-sm border p-6">
-                <h2 class="text-2xl font-bold mb-4">Bienvenido a tu panel de estudio</h2>
-                <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100 mb-6">
-                    <p class="text-indigo-800">🚀 Tienes el <b>Plan Básico</b> activo. Tienes 50 consultas de IA disponibles este mes.</p>
+            <aside class="space-y-4">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border">
+                    <h3 class="font-bold text-xs uppercase text-gray-400 mb-4">Tu Progreso</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between text-xs mb-1"><span>General</span><span>12%</span></div>
+                            <div class="w-full bg-gray-100 rounded-full h-1.5"><div class="bg-indigo-600 h-1.5 rounded-full" style="width: 12%"></div></div>
+                        </div>
+                    </div>
                 </div>
+            </aside>
+
+            <div class="lg:col-span-3 bg-white rounded-2xl shadow-sm border flex flex-col overflow-hidden" style="height: 75vh;">
+                <div class="p-4 border-b bg-indigo-50 flex items-center">
+                    <div class="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-white mr-3"><i class="fas fa-robot"></i></div>
+                    <h2 class="font-bold text-gray-800 text-sm">OpoMentor IA</h2>
                 </div>
+                <div id="chat-box" class="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50">
+                    <div class="bg-white p-4 rounded-2xl rounded-tl-none shadow-sm border max-w-[80%] text-sm">
+                        ¡Hola! Ya estoy aquí. ¿Qué tema de la oposición quieres repasar hoy?
+                    </div>
+                </div>
+                <div class="p-4 border-t bg-white">
+                    <div class="flex space-x-2">
+                        <input type="text" id="user-input" placeholder="Pregunta algo..." class="flex-1 border p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <button onclick="sendMessage()" class="bg-indigo-600 text-white px-6 rounded-xl hover:bg-indigo-700"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 
     <script>
-        // Lógica de interfaz
+        const API_URL = window.location.origin;
+
         function toggleAuth() {
             document.getElementById('login-form').classList.toggle('hidden');
             document.getElementById('register-form').classList.toggle('hidden');
         }
 
-        async function handleLogin() {
-            // Aquí llamarías a tu API /api/login
-            // Por ahora simulamos éxito:
+        function showDashboard(user) {
             document.getElementById('auth-section').classList.add('hidden');
             document.getElementById('dashboard-section').classList.remove('hidden');
-            document.getElementById('user-display-name').innerText = "Hola, Opositor";
+            document.getElementById('user-display-name').innerText = `Hola, ${user.nombre}`;
         }
 
-        function logout() {
-            location.reload();
+        async function handleRegister() {
+            const nombre = document.getElementById('reg-nombre').value;
+            const email = document.getElementById('reg-email').value;
+            const password = document.getElementById('reg-pass').value;
+
+            const res = await fetch(`${API_URL}/api/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nombre, email, password })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                localStorage.setItem('token', data.token);
+                alert("¡Bienvenido! Tu cuenta ha sido creada.");
+                showDashboard(data.user);
+            } else alert(data.error);
+        }
+
+        async function handleLogin() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-pass').value;
+
+            const res = await fetch(`${API_URL}/api/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                localStorage.setItem('token', data.token);
+                showDashboard(data.user);
+            } else alert(data.error);
+        }
+
+        function logout() { localStorage.removeItem('token'); location.reload(); }
+
+        // Función para el chat (aún sin IA real)
+        function sendMessage() {
+            const input = document.getElementById('user-input');
+            const box = document.getElementById('chat-box');
+            if(!input.value) return;
+            box.innerHTML += `<div class="flex justify-end"><div class="bg-indigo-600 text-white p-3 rounded-2xl rounded-tr-none text-sm max-w-[80%]">${input.value}</div></div>`;
+            input.value = '';
+            box.scrollTop = box.scrollHeight;
         }
     </script>
 </body>
